@@ -2,12 +2,17 @@ import pytest
 from app import create_app
 from app.config import TestingConfig
 from flask import json
+from app.extensions import mongo
 
 @pytest.fixture
 def client():
     app = create_app()
     with app.test_client() as client:
         with app.app_context():
+            #Empty database before new test begins
+            mongo.db.users.delete_many({})
+            mongo.db.posts.delete_many({})
+            mongo.db.tokens.delete_many({})
             pass
         yield client
 

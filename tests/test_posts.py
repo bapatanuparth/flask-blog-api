@@ -4,13 +4,7 @@ from app.config import TestingConfig
 from bson import ObjectId
 from flask import json
 
-@pytest.fixture
-def client():
-    app = create_app()
-    with app.test_client() as client:
-        with app.app_context():
-            pass
-        yield client
+
 
 @pytest.fixture
 def headers():
@@ -27,6 +21,12 @@ def mock_verify_token(monkeypatch):
 ################ CREATE POST ####################
 def test_create_post(client, headers):
     """Test creating a new blog post after logging in a user."""
+    #register user to be used for tests
+    client.post('/auth/register', json={
+        'username': 'testlogin',
+        'email': 'login@example.com',
+        'password': 'loginpassword'
+    })
 
     login_data = {'email': 'login@example.com', 'password': 'loginpassword'}
     login_response = client.post('/auth/login', json=login_data)
