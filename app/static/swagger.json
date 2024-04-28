@@ -1,0 +1,400 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "Blog API",
+      "description": "API for managing users and blog posts.",
+      "version": "1.0.0"
+    },
+    "host": "localhost:5000",
+    "schemes": ["http"],
+    "basePath": "/",
+    "produces": ["application/json"],
+    "paths": {
+      "/auth/register": {
+        "post": {
+          "tags": ["Auth"],
+          "summary": "Register a new user",
+          "description": "This route registers a new user with a username, email, and password.",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "User data",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/UserRegister"
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "User registered successfully",
+              "schema": {
+                "$ref": "#/definitions/UserResponse"
+              }
+            },
+            "400": {
+              "description": "Invalid input data"
+            },
+            "409": {
+              "description": "Email already in use"
+            }
+          }
+        }
+      },
+      "/auth/login": {
+        "post": {
+          "tags": ["Auth"],
+          "summary": "Login user",
+          "description": "This route logs in a user by using an email and password.",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Credentials",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/UserLogin"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Login successful",
+              "schema": {
+                "$ref": "#/definitions/LoginResponse"
+              }
+            },
+            "400": {
+              "description": "Missing email or password"
+            },
+            "404": {
+              "description": "User not found"
+            }
+          }
+        }
+      },
+      "/blogpost": {
+        "post": {
+          "tags": ["Post"],
+          "summary": "Create a new blog post",
+          "description": "This endpoint allows a user to create a new blog post with a title and content.",
+          "operationId": "createPost",
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ],
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/NewPost"
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Post created successfully",
+              "schema": {
+                "$ref": "#/definitions/PostResponse"
+              }
+            },
+            "400": {
+              "description": "Invalid input, object invalid"
+            },
+            "401": {
+              "description": "Unauthorized, token missing or invalid"
+            }
+          },
+          "security": [
+            {
+              "Bearer": []
+            }
+          ]
+        }
+      },
+      "/allPosts/{user_id}": {
+        "get": {
+          "tags": ["Post"],
+          "summary": "Retrieve all blog posts by a specific user",
+          "description": "This endpoint returns all posts created by the specified user.",
+          "operationId": "getPostsByUser",
+          "produces": ["application/json"],
+          "parameters": [
+            {
+              "name": "user_id",
+              "in": "path",
+              "description": "The ID of the user whose posts are to be retrieved",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "An array of posts",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/Post"
+                }
+              }
+            },
+            "404": {
+              "description": "No posts found for the user"
+            }
+          },
+          "security": [
+            {
+              "Bearer": []
+            }
+          ]
+        }
+      },
+      "/blogpost/{post_id}": {
+        "get": {
+          "tags": ["Post"],
+          "summary": "Retrieve a single blog post by its ID",
+          "description": "This endpoint returns a specific post identified by its unique ID.",
+          "operationId": "getPostById",
+          "produces": ["application/json"],
+          "parameters": [
+            {
+              "name": "post_id",
+              "in": "path",
+              "description": "The ID of the post to retrieve",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Detailed information about the post",
+              "schema": {
+                "$ref": "#/definitions/Post"
+              }
+            },
+            "404": {
+              "description": "Post not found"
+            }
+          },
+          "security": [
+            {
+              "Bearer": []
+            }
+          ]
+        },
+        "put": {
+          "tags": ["Post"],
+          "summary": "Update an existing blog post",
+          "description": "This endpoint allows updating title and/or content of an existing blog post identified by its ID.",
+          "operationId": "updatePostById",
+          "produces": ["application/json"],
+          "parameters": [
+            {
+              "name": "post_id",
+              "in": "path",
+              "description": "The ID of the post to update",
+              "required": true,
+              "type": "string"
+            },
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Post object with updated fields",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/UpdatePost"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Post updated successfully",
+              "schema": {
+                "$ref": "#/definitions/Post"
+              }
+            },
+            "400": {
+              "description": "Invalid input, object invalid"
+            },
+            "404": {
+              "description": "Post not found or no changes to update"
+            },
+            "500": {
+              "description": "Failed to fetch updated post"
+            }
+          },
+          "security": [
+            {
+              "Bearer": []
+            }
+          ]
+        },
+        "delete": {
+          "tags": ["Post"],
+          "summary": "Delete a blog post",
+          "description": "This endpoint deletes a blog post identified by its ID.",
+          "operationId": "deletePostById",
+          "produces": ["application/json"],
+          "parameters": [
+            {
+              "name": "post_id",
+              "in": "path",
+              "description": "The ID of the post to delete",
+              "required": true,
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Post deleted successfully"
+            },
+            "404": {
+              "description": "Post not found"
+            }
+          },
+          "security": [
+            {
+              "Bearer": []
+            }
+          ]
+        }
+      }    
+      
+    },
+    "securityDefinitions": {
+      "Bearer": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    },
+    "definitions": {
+      "UserRegister": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "UserLogin": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "string"
+          },
+          "userID": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "userID": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "NewPost": {
+        "type": "object",
+        "required": [
+          "title",
+          "content",
+          "author_id"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "A Day in the Life"
+          },
+          "content": {
+            "type": "string",
+            "example": "Today was a good day..."
+          },
+          "author_id": {
+            "type": "string",
+            "example": "507f1f77bcf86cd799439011"
+          }
+        }
+      },
+      "PostResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "post": {
+            "$ref": "#/definitions/NewPost"
+          }
+        }
+      },
+      "Post": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "507f1f77bcf86cd799439011"
+          },
+          "title": {
+            "type": "string",
+            "example": "How to Use Swagger"
+          },
+          "content": {
+            "type": "string",
+            "example": "Swagger is a tool for documenting APIs..."
+          },
+          "author_id": {
+            "type": "string",
+            "example": "507f1f77bcf86cd799439011"
+          }
+        }
+      },
+      "UpdatePost": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Updated Title"
+          },
+          "content": {
+            "type": "string",
+            "example": "Updated content of the post."
+          }
+        }
+      }
+     
+    }
+  }
+  
