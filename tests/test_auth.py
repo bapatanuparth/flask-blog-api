@@ -13,7 +13,7 @@ def client():
             mongo.db.users.delete_many({})
             mongo.db.posts.delete_many({})
             mongo.db.tokens.delete_many({})
-            pass
+            
         yield client
 
 ########### REGISTER ############

@@ -3,8 +3,15 @@ from app import create_app
 from app.config import TestingConfig
 from bson import ObjectId
 from flask import json
+from app.extensions import mongo
 
 
+@pytest.fixture
+def client():
+    app = create_app()
+    with app.test_client() as client:
+        with app.app_context():
+            yield client
 
 @pytest.fixture
 def headers():
